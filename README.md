@@ -8,26 +8,74 @@ KELAS: TI.22.A5
 
 
 # MEMBUAT TABLE
-
-![Screenshot 2024-04-30 002741](https://github.com/dhomuhammad/lab-7/assets/130027527/10434031-7e9d-4e05-9599-a7eeb7fc1ed1)
-
+```
+CREATE TABLE artikel (
+  id INT(11) auto_increment,
+  judul VARCHAR(200) NOT NULL,
+  isi TEXT,
+  gambar VARCHAR(200),
+  status TINYINT(1) DEFAULT 0,
+  slug VARCHAR(200),
+  PRIMARY KEY(id)
+);
+```
 
 # membuat model 
 
 untuk memperoses data artikel buat file baru pada direktori Apps/Models dengan nama Artikel.mode.php
+```
+namespace App\Models;
 
+use CodeIgniter\Model;
 
-![Screenshot 2024-04-30 002802](https://github.com/dhomuhammad/lab-7/assets/130027527/b3859a04-435c-42f8-ba0e-d832b8574eb5)
+class ArtikelModel extends Model
+{
+    protected $table = 'artikel';
+    protected $primaryKey = 'id';
+    protected $useAutoIncrement = true;
+    protected $allowedFields = ['judul', 'isi', 'status', 'slug', 'gambar'];
+}
+```
 
 
 # MEMBUAT CONTROLLER
 
 buat controller baru dengan nama artikel.php pada direktori app/Controllers
+```
+namespace App\Controllers;
 
+use App\Models\ArtikelModel;
 
-![Screenshot 2024-04-30 002814](https://github.com/dhomuhammad/lab-7/assets/130027527/32dd1199-9263-4926-bacc-999a26af303c)
-
-
+class Artikel extends BaseController
+{
+    public function index()
+    {
+        $title = 'daftar Artikel';
+        $model = new ArtikelModel();
+        $artikel = $model->findAll();
+        return view('artikel/index', compact('artikel', 'title'));
+    }
+}
+```
 # MEMBUAT VIEW
 
-![Screenshot 2024-04-30 002829](https://github.com/dhomuhammad/lab-7/assets/130027527/e1f7b540-10bf-47fc-a04b-08d4b5519657)
+```
+<?= $this->include('template/header'); ?>
+
+<?php if($artikel): foreach($artikel as $row): ?>
+<article class="entry">
+    <h2<a href="<?= base_url('/artikel/' . $row['slug']);?>"><?
+$row['judul']; ?></a>
+</h2>
+      <img src="<?= base_url('/gambar/' . $row['gambar']);?>" alt="<?=
+$row['judul']; ?>">
+    <p><?= substr($row['isi], 0, 200); ?></p>
+</article>
+<hr class="divider" />
+<?php endforeach; else: ?>
+<article class="entry">
+    <h2>Belum ada data.</h2>
+</article>
+<?php endif; ?>
+
+<?= $this->include(template/footer'); ?>
